@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: rag-agent-demo
+  ai:
+    retry:
+      max-attempts: 3          # 最大重试次数（不含第一次调用）
+      on-client-errors: false  # 4xx 错误不重试（默认）
+      backoff:
+        initial-interval: 1s   # 首次重试前等待 1 秒
+        multiplier: 2          # 指数退避乘数
+        max-interval: 30s      # 最大等待间隔
+    ollama:
+      # Ollama 默认端口；如果在本机跑，一般不用改
+      base-url: http://localhost:11434
+      chat:
+        options:
+          # 改成你本机已经 pull 的模型名（ollama list 查看）
+          model: qwen2.5:7b
+          # 知识库问答温度不要太高，减少自由发挥
+          temperature: 0.0
+      embedding:
+        options:
+          # 使用 nomic-embed-text 生成文本向量
+          model: nomic-embed-text:latest
+  client:
+    observations:
+      log-prompt: true
+      log-completion: true
+
+server:
+  port: 18082
+
+logging:
+  level:
+    org.springframework.ai: DEBUG
+    org.springframework.ai.tool: TRACE
+    org.springframework.ai.chat.observation: DEBUG
+    org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG
